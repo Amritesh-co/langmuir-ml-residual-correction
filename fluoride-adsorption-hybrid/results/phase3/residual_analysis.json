@@ -1,0 +1,23 @@
+{
+  "phase": "Phase 3: Residual Analysis & Feature Engineering",
+  "date": "2026-05-05",
+  "n_samples": 500,
+  "n_original_factors": 10,
+  "n_engineered_features": 28,
+  "n_total_features": 38,
+  "train_samples": 400,
+  "test_samples": 100,
+  "quick_rf_metrics": {
+    "train_R2": 0.9038531425496407,
+    "test_R2": 0.4728602168749757,
+    "top_feature": "pH_abs_dev",
+    "top_feature_importance": 0.2108967656993991
+  },
+  "key_findings": {
+    "dominant_factor": "pH",
+    "pH_4_5_mean_residual": -0.5249978056489658,
+    "pH_6p5_7_mean_residual": 0.6490649924054321,
+    "ml_opportunity": "pH 6.5-7 (model underestimates by +0.649 mg/g)",
+    "top_feature": "pH_abs_dev"
+  }
+}

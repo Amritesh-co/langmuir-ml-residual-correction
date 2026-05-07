@@ -1,0 +1,17 @@
+{
+  "phase": "Phase 2: Langmuir Fitting",
+  "date": "2026-05-03",
+  "n_samples": 500,
+  "n_factors": 10,
+  "n_features_original": 10,
+  "n_features_expanded": 66,
+  "model_type": "Multi-factor Langmuir (Polynomial degree 2)",
+  "scaling": "StandardScaler (both X and y)",
+  "performance_metrics": {
+    "R2": 0.8157843036148862,
+    "RMSE": 0.5277600195589893,
+    "MAE": 0.4281921393932735,
+    "residual_mean": -6.634692795159935e-16,
+    "residual_std": 0.5277600195589893
+  }
+}

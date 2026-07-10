@@ -1,0 +1,309 @@
+\chapter*{APPENDIX}
+\addcontentsline{toc}{chapter}{APPENDIX}
+\markboth{APPENDIX}{APPENDIX}
+\setcounter{section}{0}
+\renewcommand{\thesection}{A.\arabic{section}}
+
+The appendix presents selected implementation details, sample code snippets, and supporting outputs used during the development of the proposed AI-based multi-label food spoilage detection system. The implementation was carried out using Python in the Google Colab environment with TensorFlow, Keras, OpenCV, NumPy, Matplotlib, and Streamlit libraries. The appendix provides an overview of important code sections used for dataset preprocessing, model development, prediction generation, Explainable AI visualization, and web application deployment.
+
+The developed system utilized transfer learning architectures such as MobileNetV2 and ResNet50 for spoilage classification. Image preprocessing operations including resizing, normalization, and augmentation were implemented to improve model training and generalization capability. Grad-CAM visualization techniques were also integrated to improve interpretability of model predictions. The following code snippets represent important implementation modules used in the project.
+
+\section[Importing Required Libraries]{\textbf{Importing Required Libraries}}
+The following libraries were imported for image preprocessing, deep learning model development, visualization, and performance evaluation. TensorFlow and Keras were used for model training, while OpenCV and NumPy were used for image processing operations.
+
+\begin{lstlisting}[language=Python, caption=Importing Python libraries]
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras.applications import MobileNetV2, ResNet50
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+\end{lstlisting}
+
+\section[Dataset Preprocessing and Augmentation]{\textbf{Dataset Preprocessing and Augmentation}}
+Image preprocessing and augmentation techniques were applied to improve dataset quality and increase data diversity. Augmentation operations such as rotation, zooming, horizontal flipping, and brightness adjustment helped reduce overfitting and improve model generalization capability.
+
+\begin{lstlisting}[language=Python, caption=Dataset preprocessing and augmentation pipeline]
+train_datagen = ImageDataGenerator(
+    rescale=1./255,
+    rotation_range=30,
+    zoom_range=0.2,
+    horizontal_flip=True,
+    brightness_range=[0.7,1.3]
+)
+
+train_generator = train_datagen.flow_from_directory(
+    '/content/data/train',
+    target_size=(224,224),
+    batch_size=32,
+    class_mode='categorical'
+)
+\end{lstlisting}
+
+\section[MobileNetV2 Model Architecture]{\textbf{MobileNetV2 Model Architecture}}
+Transfer learning was implemented using MobileNetV2 pretrained on the ImageNet dataset. The pretrained backbone was used for feature extraction, while additional dense and dropout layers were added for spoilage stage classification.
+
+\begin{lstlisting}[language=Python, caption=MobileNetV2 model construction]
+base_model = MobileNetV2(
+    include_top=False,
+    weights='imagenet',
+    input_shape=(224,224,3)
+)
+
+base_model.trainable = False
+
+model = keras.Sequential([
+    base_model,
+    layers.GlobalAveragePooling2D(),
+    layers.Dense(256, activation='relu'),
+    layers.Dropout(0.4),
+    layers.Dense(4, activation='softmax')
+])
+\end{lstlisting}
+
+\section[Model Compilation and Training]{\textbf{Model Compilation and Training}}
+The model was compiled using the Adam optimizer and categorical cross-entropy loss function. Training and validation datasets were used to evaluate model learning performance during multiple training epochs.
+
+\begin{lstlisting}[language=Python, caption=Model compilation and training process]
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+history = model.fit(
+    train_generator,
+    validation_data=val_generator,
+    epochs=20
+)
+\end{lstlisting}
+
+\section[Prediction Function]{\textbf{Prediction Function}}
+The prediction pipeline processed uploaded food images and generated spoilage stage predictions using the trained deep learning model. The predicted class was obtained using the highest probability score from the softmax output layer.
+
+\begin{lstlisting}[language=Python, caption=Prediction function for multi-label classification]
+def predict_image(image_path):
+    img = cv2.imread(image_path)
+    img = cv2.resize(img, (224,224))
+    img = img / 255.0
+    img = np.expand_dims(img, axis=0)
+
+    prediction = model.predict(img)
+    predicted_class = np.argmax(prediction)
+
+    return predicted_class
+\end{lstlisting}
+
+\section[Grad-CAM Visualization]{\textbf{Grad-CAM Visualization}}
+Grad-CAM was implemented to generate heatmaps highlighting important image regions influencing the prediction process. The Explainable AI component improved transparency and interpretability of the deep learning model.
+
+\begin{lstlisting}[language=Python, caption=Grad-CAM heatmap implementation]
+def gradcam_heatmap(img_array, model):
+    grad_model = tf.keras.models.Model(
+        [model.inputs],
+        [model.get_layer().output, model.output]
+    )
+\end{lstlisting}
+
+\section[Streamlit Web Interface]{\textbf{Streamlit Web Interface}}
+A Streamlit-based web application was developed to provide a simple and interactive interface for real-time spoilage prediction. Users could upload fruit or vegetable images and obtain spoilage predictions instantly.
+
+\begin{lstlisting}[language=Python, caption=Streamlit web application snippet]
+import streamlit as st
+
+st.title("AI-Based Food Spoilage Detection")
+
+uploaded_file = st.file_uploader(
+    "Upload Fruit or Vegetable Image"
+)
+
+if uploaded_file is not None:
+    st.image(uploaded_file)
+\end{lstlisting}
+
+\section[Performance Evaluation Metrics]{\textbf{Performance Evaluation Metrics}}
+Different performance evaluation metrics such as Accuracy, Precision, Recall, and F1-Score were used to analyze the classification performance of the proposed models.
+
+\begin{lstlisting}[language=Python, caption=Evaluation metrics import]
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score
+)
+\end{lstlisting}
+
+\section[IoT Firmware: ESP8266 Blynk Integration]{\textbf{IoT Firmware: ESP8266 Blynk Integration}}
+The IoT subsystem firmware was implemented on an ESP8266 microcontroller to interface with MQ-135 gas sensors and DHT11/DHT22 temperature-humidity sensors. The firmware integrates with Blynk cloud platform for real-time data transmission, local LCD display monitoring, and automated alert triggering. The following code represents the complete Arduino sketch for the IoT sensor integration module.
+
+\begin{lstlisting}[language=C, caption=ESP8266 Blynk firmware for food spoilage monitoring]
+#define BLYNK_TEMPLATE_ID "TMPL3K_iKoy77"
+#define BLYNK_TEMPLATE_NAME "Food Spoilege detections"
+#define BLYNK_AUTH_TOKEN "YrmWQOMAA8Fs9_0OmlkreAO5kcXZ3Vx3"
+
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+#include <DHT.h>
+
+// Mobile Hotspot Credentials
+const char* ssid = "OnePlus Nord CE5 7DCA";
+const char* password = "123456789";
+
+// Pin Configurations
+const int MQ3_PIN = A0;
+#define DHTPIN D3
+#define DHTTYPE DHT11
+#define BUZZER_PIN D5
+#define GREEN_LED D6
+#define RED_LED D7
+
+// Component Initializations
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+DHT dht(DHTPIN, DHTTYPE);
+BlynkTimer timer;
+
+// Control Flags
+bool alertTriggered = false;
+bool displayToggle = true;
+
+void monitorSystem() {
+  // Read Sensor Telemetry
+  int sensorValue = analogRead(MQ3_PIN);
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+
+  // Handle Sensor Errors Gracefully
+  if (isnan(humidity) || isnan(temperature)) {
+    humidity = 0;
+    temperature = 0;
+  }
+
+  // Push Stream Data to Blynk Virtual Pins
+  Blynk.virtualWrite(V2, sensorValue);    // Gauge / Chart Widget
+  Blynk.virtualWrite(V3, temperature);    // Temp Value Widget
+  Blynk.virtualWrite(V4, humidity);       // Humidity Value Widget
+
+  String stageText = "FRESH";
+
+  // 4-Stage State Machine Integration
+  if (sensorValue > 750) {
+    stageText = "SEVERE";
+    digitalWrite(BUZZER_PIN, HIGH);
+    digitalWrite(GREEN_LED, LOW);
+    digitalWrite(RED_LED, HIGH);
+
+    // Fire cloud automation event (Triggers Push and Email)
+    if (!alertTriggered) {
+      Blynk.logEvent("spoilage_alert");
+      alertTriggered = true;
+    }
+  }
+  else if (sensorValue > 500) {
+    stageText = "MODERATE";
+    digitalWrite(BUZZER_PIN, HIGH);
+    digitalWrite(GREEN_LED, LOW);
+    digitalWrite(RED_LED, HIGH);
+    alertTriggered = false;
+  }
+  else if (sensorValue > 300) {
+    stageText = "EARLY";
+    digitalWrite(BUZZER_PIN, LOW);
+    digitalWrite(GREEN_LED, HIGH);
+    digitalWrite(RED_LED, LOW);
+    alertTriggered = false;
+  }
+  else {
+    stageText = "FRESH";
+    digitalWrite(BUZZER_PIN, LOW);
+    digitalWrite(GREEN_LED, HIGH);
+    digitalWrite(RED_LED, LOW);
+    alertTriggered = false;
+  }
+
+  // Local Output Interface Logic (Display toggles every 2 seconds)
+  lcd.clear();
+  if (displayToggle) {
+    lcd.setCursor(0, 0);
+    lcd.print("Gas Value: ");
+    lcd.print(sensorValue);
+    lcd.setCursor(0, 1);
+    lcd.print("Stage: ");
+    lcd.print(stageText);
+  } else {
+    lcd.setCursor(0, 0);
+    lcd.print("Temp: ");
+    lcd.print(temperature, 1);
+    lcd.print(" C");
+    lcd.setCursor(0, 1);
+    lcd.print("Humid: ");
+    lcd.print(humidity, 1);
+    lcd.print(" %");
+  }
+
+  displayToggle = !displayToggle;
+}
+
+void setup() {
+  Wire.begin(D2, D1);
+
+  // Initialize Hardware Pin Registers
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(GREEN_LED, OUTPUT);
+  pinMode(RED_LED, OUTPUT);
+
+  // Enforce safe startup power values
+  digitalWrite(BUZZER_PIN, LOW);
+  digitalWrite(GREEN_LED, LOW);
+  digitalWrite(RED_LED, LOW);
+
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print("System Booting...");
+  lcd.setCursor(0, 1);
+  lcd.print("Waking Sensors...");
+
+  dht.begin();
+
+  // Initialize network socket parameters
+  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, password);
+  timer.setInterval(2000L, monitorSystem);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("System Online!");
+  lcd.setCursor(0, 1);
+  lcd.print("HARISH");
+  delay(1500);
+}
+
+void loop() {
+  Blynk.run();
+  timer.run();
+}
+\end{lstlisting}
+
+\textbf{Key Implementation Features:}
+\begin{itemize}
+    \item \textbf{Blynk Integration}: Cloud connectivity with template ID and auth token for remote monitoring and alert triggering.
+    \item \textbf{Sensor Fusion}: Real-time acquisition of MQ-135 gas concentration (analog pin A0) and DHT11 temperature-humidity data (pin D3).
+    \item \textbf{4-Stage Classification}: Threshold-based spoilage stage determination:
+    \begin{itemize}
+        \item \textbf{Fresh}: Gas $\leq 300$ ppm
+        \item \textbf{Early Spoilage}: $300 < $ Gas $\leq 500$ ppm
+        \item \textbf{Moderate Spoilage}: $500 < $ Gas $\leq 750$ ppm
+        \item \textbf{Severe Spoilage}: Gas $> 750$ ppm
+    \end{itemize}
+    \item \textbf{Visual Feedback}: Tri-color LED indicator (Green=Fresh/Early, Red=Moderate/Severe) and piezo buzzer alarm for severe conditions.
+    \item \textbf{LCD Display}: 16x2 I2C LCD alternates between gas/stage and temperature/humidity readings every 2 seconds.
+    \item \textbf{Asynchronous Monitoring}: BlynkTimer executes sensor monitoring at 2-second intervals without blocking the main loop.
+    \item \textbf{Alert Mechanism}: Spoilage alerts are logged to Blynk cloud platform triggering push notifications and email alerts when severe spoilage is detected.
+\end{itemize}
+
+The appendix demonstrates important implementation modules used during the development of the proposed food spoilage detection system. These implementation details support the methodologies and experimental results discussed in the previous chapters.

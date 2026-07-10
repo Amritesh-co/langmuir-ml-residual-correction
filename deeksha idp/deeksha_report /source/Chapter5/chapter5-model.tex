@@ -1,0 +1,100 @@
+\chapter{DEEP LEARNING AND IoT-BASED SPOILAGE DETECTION SYSTEM}
+The proposed system integrates Artificial Intelligence (AI), Deep Learning, Computer Vision, Internet of Things (IoT), and Explainable AI techniques to develop an automated food spoilage detection and monitoring system. The system is designed to classify fruits and vegetables into four spoilage stages: Fresh, Early Spoilage, Moderate Spoilage, and Severe Spoilage. The complete workflow consists of dataset preparation, image preprocessing, data augmentation, deep learning model training, IoT sensor integration, prediction fusion, Explainable AI visualization, and deployment through a Streamlit-based web application. The integration of image analysis and environmental sensing improves prediction reliability and enables real-time food quality monitoring. This chapter discusses the architecture, implementation details, and working principles of the proposed system.
+
+\section[System Architecture]{\textbf{System Architecture}}
+The overall architecture of the proposed system consists of multiple interconnected modules working together for food spoilage detection and prediction. The system mainly contains the image-based deep learning module, IoT-based environmental monitoring module, prediction fusion module, Explainable AI module, and web application interface. The image analysis component processes food images and extracts visual features associated with spoilage, while the IoT sensing component monitors environmental parameters influencing spoilage progression.
+
+Initially, food images are collected from publicly available datasets and organized according to spoilage stages. These images are passed through preprocessing and augmentation pipelines before being used for model training. The deep learning module performs spoilage classification using CNN and transfer learning architectures. Simultaneously, environmental sensor data are collected using MQ-135 gas sensors and DHT11/DHT22 temperature-humidity sensors connected through Arduino Uno or ESP32 microcontrollers.
+
+The prediction outputs from the image analysis module and IoT sensor module are combined using a weighted fusion mechanism to generate the final spoilage stage prediction. Explainable AI techniques such as Grad-CAM generate heatmaps highlighting important image regions influencing predictions. The final output is displayed through a Streamlit-based web application where users can upload images, monitor sensor readings, and visualize spoilage predictions in real time.
+
+\begin{table}[H]
+	\centering
+	\caption{Major Components of the Proposed System}
+	\label{tab:major_components}
+	\begin{tabular}{|l|l|}
+		\hline
+		\textbf{Component} & \textbf{Function} \\ \hline
+		Dataset Module & Collection and organization of food images \\ \hline
+		Preprocessing Module & Image resizing, normalization, and augmentation \\ \hline
+		Deep Learning Module & Spoilage stage classification \\ \hline
+		IoT Sensor Module & Environmental monitoring \\ \hline
+		Fusion Module & Combination of image and sensor predictions \\ \hline
+		Explainable AI Module & Grad-CAM visualization \\ \hline
+		Web Interface & User interaction and prediction display \\ \hline
+	\end{tabular}
+\end{table}
+
+\section[Deep Learning Model Development]{\textbf{Deep Learning Model Development}}
+Deep learning models are used for image-based spoilage classification because of their strong feature extraction and pattern recognition capabilities. Convolutional Neural Networks (CNNs) are highly effective in image classification tasks because they automatically learn hierarchical features such as edges, textures, patterns, and object structures from images. In food spoilage detection, CNN models learn visual spoilage indicators including mold growth, discoloration, bruises, dark spots, and texture degradation from fruit and vegetable images.
+
+The proposed system uses CNN-based transfer learning architectures such as MobileNetV2, ResNet50, and EfficientNetB0. Transfer learning improves classification performance by utilizing pretrained ImageNet weights and fine-tuning the models for food spoilage detection. This reduces training complexity and improves prediction accuracy even when the available dataset size is limited. The classification head added to the pretrained backbone consists of fully connected dense layers, batch normalization layers, activation functions, and dropout layers for regularization.
+
+The models are trained using categorical cross-entropy loss and Adam optimization algorithms. Batch normalization improves training stability, while dropout layers reduce overfitting by randomly disabling neurons during training. Training is performed in two stages. During the first stage, pretrained backbone layers are frozen and only the classification layers are trained. During the second stage, selected backbone layers are unfrozen and fine-tuned using a smaller learning rate to improve feature extraction capability. Performance evaluation is performed using accuracy, precision, recall, F1-score, confusion matrix, and ROC-AUC analysis.
+
+\begin{table}[H]
+	\centering
+	\caption{Deep Learning Models Used}
+	\label{tab:dl_models}
+	\begin{tabular}{|l|l|l|}
+		\hline
+		\textbf{Model} & \textbf{Purpose} & \textbf{Advantage} \\ \hline
+		CNN & Baseline spoilage classification & Simple architecture \\ \hline
+		MobileNetV2 & Lightweight transfer learning & Fast inference speed \\ \hline
+		ResNet50 & Deep feature extraction & Improved classification accuracy \\ \hline
+		EfficientNetB0 & Optimized transfer learning & Better efficiency and performance \\ \hline
+	\end{tabular}
+\end{table}
+
+\section[IoT-Based Environmental Monitoring]{\textbf{IoT-Based Environmental Monitoring}}
+Environmental conditions significantly influence food spoilage and microbial growth. Temperature, humidity, and gas concentration affect the rate of decomposition, microbial activity, and spoilage progression in fruits and vegetables. Therefore, IoT-based environmental monitoring is integrated into the proposed system to improve prediction reliability and support real-time spoilage analysis.
+
+The system uses MQ-135 gas sensors to detect gases and volatile compounds released during food decomposition. The sensor is sensitive to gases such as ammonia, benzene, smoke, and volatile organic compounds associated with spoilage. DHT11/DHT22 sensors are used to monitor environmental temperature and humidity conditions. These sensors are connected to microcontrollers such as Arduino Uno or ESP32 microcontrollers for continuous data acquisition and communication.
+
+The collected sensor readings are processed using threshold-based analysis to estimate spoilage risk. High temperature, humidity, and gas concentration values increase the environmental spoilage risk score. The IoT module continuously monitors environmental conditions and provides additional information beyond image-based prediction. This enables early spoilage detection even before severe visual deterioration becomes visible.
+
+\begin{table}[H]
+	\centering
+	\caption{IoT Hardware Components}
+	\label{tab:hardware_components}
+	\begin{tabular}{|l|l|}
+		\hline
+		\textbf{Hardware Component} & \textbf{Function} \\ \hline
+		MQ-135 Gas Sensor & Detection of spoilage-related gases \\ \hline
+		DHT11/DHT22 Sensor & Temperature and humidity monitoring \\ \hline
+		Arduino Uno / ESP32 & Sensor interfacing and data acquisition \\ \hline
+		Breadboard and Jumper Wires & Circuit connections \\ \hline
+		Power Supply & Hardware operation \\ \hline
+	\end{tabular}
+\end{table}
+
+\section[Sensor Fusion and Prediction System]{\textbf{Sensor Fusion and Prediction System}}
+The proposed system combines image-based deep learning predictions and IoT sensor-based spoilage analysis using a weighted fusion mechanism. The deep learning module generates probability scores for each spoilage stage based on visual image analysis, while the IoT module generates environmental spoilage risk scores based on sensor readings. These outputs are combined mathematically to generate the final spoilage stage prediction.
+
+The weighted fusion approach improves system robustness because both visual and environmental information contribute to prediction generation. In some cases, visual spoilage symptoms may not be clearly visible, but unfavorable environmental conditions such as high humidity or gas concentration may indicate early spoilage progression. The sensor fusion mechanism enables the system to provide more reliable and practical predictions compared to conventional image-only approaches.
+
+The final prediction output includes the predicted spoilage stage, confidence score, Grad-CAM visualization, and IoT sensor status. The prediction pipeline supports real-time food quality monitoring and enables practical deployment for household kitchens, grocery stores, warehouses, and smart inventory management systems.
+
+\begin{table}[H]
+	\centering
+	\caption{Sensor Fusion Parameters}
+	\label{tab:fusion_params}
+	\begin{tabular}{|l|l|}
+		\hline
+		\textbf{Input Source} & \textbf{Weight Contribution} \\ \hline
+		Image-Based Prediction & 0.75 \\ \hline
+		IoT Sensor Risk Score & 0.25 \\ \hline
+	\end{tabular}
+\end{table}
+
+\section[Explainable AI Using Grad-CAM]{\textbf{Explainable AI Using Grad-CAM}}
+Explainable Artificial Intelligence (XAI) techniques are integrated into the proposed system to improve transparency and interpretability of deep learning predictions. Most deep learning systems operate as black-box models and do not explain how predictions are generated. In practical food monitoring systems, understanding the prediction process is important for improving user trust and validating model behaviour.
+
+The proposed system uses Grad-CAM (Gradient-weighted Class Activation Mapping) to generate heatmaps highlighting image regions influencing the classification result. Grad-CAM uses gradient information from the final convolutional layers to identify important regions contributing to the prediction. The generated heatmaps highlight spoilage indicators such as mold patches, bruises, discoloration, dark spots, and texture degradation.
+
+The Explainable AI module improves transparency by allowing users to understand whether the model focuses on meaningful spoilage regions during prediction. This also helps validate model performance and improves reliability of the AI-based spoilage detection system for practical real-world applications.
+
+\section[Streamlit-Based Web Interface]{\textbf{Streamlit-Based Web Interface}}
+A simple and interactive web interface is developed using Streamlit for real-time spoilage prediction and monitoring. The web application allows users to upload images of fruits and vegetables and instantly view spoilage predictions generated by the trained deep learning model. The interface displays the predicted spoilage stage, confidence score, Grad-CAM visualization, and IoT sensor readings.
+
+The Streamlit-based interface follows a clean and minimal design inspired by food freshness and usability principles. Users can interact with the system through image upload and drag-and-drop functionality. The web application also supports visualization of environmental sensor data and spoilage risk analysis. The deployment demonstrates the practical implementation of the proposed AI-IoT spoilage detection system for food quality monitoring and food waste reduction applications.

@@ -1,0 +1,47 @@
+\chapter{THEORY AND FUNDAMENTALS OF AI-BASED FOOD SPOILAGE DETECTION}
+Artificial Intelligence (AI)-based food spoilage detection combines concepts from food science, computer vision, deep learning, image processing, Internet of Things (IoT), and Explainable AI to develop automated food quality monitoring systems. Food spoilage occurs due to microbial growth, enzymatic activity, oxidation, and environmental conditions such as temperature and humidity. Detecting spoilage at an early stage is important for reducing food waste and improving food safety. Traditional methods mainly rely on manual inspection based on visual appearance, odor, and texture, which are subjective and inconsistent. Recent advancements in deep learning and IoT technologies have enabled automated systems capable of identifying spoilage indicators accurately using image analysis and environmental sensing.
+
+Deep learning models such as Convolutional Neural Networks (CNNs) and transfer learning architectures are widely used for food image classification because of their ability to automatically learn complex image features. IoT sensors such as MQ-135 gas sensors and DHT11/DHT22 temperature-humidity sensors are additionally used to monitor environmental conditions associated with spoilage progression. Explainable AI techniques such as Grad-CAM improve transparency by highlighting image regions influencing model predictions. This chapter discusses the theoretical concepts related to food spoilage, image processing, deep learning models, transfer learning, IoT sensing, sensor fusion, and Explainable AI used in the present study.
+
+\section[Fundamentals of Food Spoilage]{\textbf{Fundamentals of Food Spoilage}}
+Food spoilage is a complex process involving biochemical, physical, and microbial changes that render food unfit for consumption. In fruits and vegetables, this process is primarily driven by their high water activity and respiration rates. Microbial spoilage is caused by bacteria, yeasts, and molds that colonize the surface and internal tissues, leading to decomposition. Enzymatic spoilage, such as enzymatic browning, occurs when polyphenol oxidase enzymes react with oxygen, causing discoloration.
+
+The progression of spoilage can be categorized into four distinct stages:
+\begin{enumerate}
+    \item \textbf{Fresh}: The food item retains its original color, texture, and nutritional value with no visible signs of degradation.
+    \item \textbf{Early Spoilage}: Subtle changes appear, such as slight softening or minor color shifts. Ethylene gas emission may start increasing at this stage.
+    \item \textbf{Moderate Spoilage}: Visible mold growth, dark spots, and significant texture degradation become apparent. The release of volatile organic compounds (VOCs) increases.
+    \item \textbf{Severe Spoilage}: Extensive decay, liquefaction, and strong unpleasant odors characterize this stage, making the item hazardous for consumption.
+\end{enumerate}
+
+\section[Image Processing and Deep Learning for Spoilage Detection]{\textbf{Image Processing and Deep Learning for Spoilage Detection}}
+Deep Learning, specifically Convolutional Neural Networks (CNNs), has revolutionized computer vision by eliminating the need for manual feature engineering. A standard CNN architecture consists of multiple layers:
+\begin{itemize}
+    \item \textbf{Convolutional Layers}: Use learnable filters to detect local patterns like edges, textures, and color gradients associated with mold or bruises.
+    \item \textbf{Pooling Layers}: Reduce spatial dimensions (e.g., Max Pooling) to achieve translation invariance and decrease computational load.
+    \item \textbf{Fully Connected Layers}: Map the extracted high-level features to the final four classification categories.
+\end{itemize}
+
+Transfer Learning is employed to leverage models pretrained on the ImageNet dataset. This approach is highly effective for food spoilage detection where labeled datasets may be limited.
+\begin{itemize}
+    \item \textbf{MobileNetV2}: Utilizes depthwise separable convolutions to provide a lightweight yet powerful model suitable for real-time mobile deployment.
+    \item \textbf{ResNet50}: Uses residual blocks (skip connections) to overcome the vanishing gradient problem, allowing for deeper architectures and better feature extraction.
+    \item \textbf{EfficientNetB0}: Implements compound scaling to balance network depth, width, and resolution, optimizing both accuracy and efficiency.
+\end{itemize}
+
+\section[IoT Sensors and Environmental Monitoring]{\textbf{IoT Sensors and Environmental Monitoring}}
+Environmental factors are critical indicators of the storage health of food products. The integration of IoT sensors provides a continuous data stream that complements visual analysis.
+\begin{itemize}
+    \item \textbf{MQ-135 Gas Sensor}: This semiconductor sensor has a SnO2 sensitive layer whose conductivity changes in the presence of gases like Ammonia (NH3), Ethanol, and Carbon Dioxide (CO2). These gases are typical byproducts of microbial respiration and fermentation in spoiling food.
+    \item \textbf{DHT11/DHT22 Sensors}: These sensors measure ambient temperature and relative humidity. High temperature and humidity levels accelerate the growth of pathogens and spoilage organisms, significantly reducing the shelf life of produce.
+\end{itemize}
+The data from these sensors is transmitted to a microcontroller (ESP32 or Arduino Uno) where it is sampled and analyzed against predefined thresholds to calculate a real-time 'Environmental Risk Score'.
+
+\section[Explainable AI and Sensor Fusion]{\textbf{Explainable AI and Sensor Fusion}}
+Explainable AI (XAI) addresses the 'black-box' nature of deep learning. \textbf{Grad-CAM} (Gradient-weighted Class Activation Mapping) uses the gradients of any target concept (e.g., 'Severe Spoilage') flowing into the final convolutional layer to produce a localization map. This heatmap highlights the specific pixels that influenced the model's decision, such as a patch of white mold on an orange or a dark bruise on a banana, thereby providing visual justification for the prediction.
+
+\textbf{Sensor Fusion} is implemented using a weighted decision mechanism. Let $C_{img}$ be the confidence score from the deep learning model and $R_{env}$ be the risk score derived from the IoT sensors. The final integrated score $S_{final}$ is calculated as:
+\begin{equation}
+    S_{final} = (\alpha \cdot C_{img}) + (\beta \cdot R_{env})
+\end{equation}
+where $\alpha$ and $\beta$ are weights assigned based on the reliability of the image and sensor data in a given environment. This fusion ensures that the system remains robust even if the visual data is obscured by poor lighting or if the sensor data is noisy.

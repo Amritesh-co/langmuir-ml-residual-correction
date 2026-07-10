@@ -1,0 +1,60 @@
+\chapter{DATASET PREPARATION AND PRE-ANALYSIS}
+The effectiveness of deep learning-based food spoilage detection systems depends significantly on the quality of the dataset, pre-processing methods, labelling strategy, and training workflow. Proper dataset preparation improves classification performance, reduces overfitting, and enhances the generalization capability of deep learning models. Since the proposed system performs multi-label spoilage classification, careful organization and preprocessing of food images are necessary to ensure reliable prediction across different spoilage conditions. This chapter discusses dataset collection, spoilage stage labeling, preprocessing techniques, augmentation methods, dataset balancing, and the tools and hardware used for implementation.
+
+\section[Dataset Collection and Organization]{\textbf{Dataset Collection and Organization}}
+The dataset for this project was curated by aggregating images from multiple high-quality sources, including the 'Fruits 360' dataset on Kaggle and various open-source computer vision repositories. To ensure the model is robust across different produce types, the collection focuses on three primary categories: tomatoes, bananas, and apples, which exhibit distinct visual spoilage patterns (e.g., softening and browning in bananas vs. mold and skin shriveling in tomatoes). 
+
+The total dataset comprises approximately 4,500 high-resolution images. These are organized into a hierarchical structure where the root directory contains sub-folders for each food type, which are further divided into the four target classes: \textit{Fresh}, \textit{Early Spoilage}, \textit{Moderate Spoilage}, and \textit{Severe Spoilage}. To maintain real-world applicability, the images include various backgrounds, occlusions, and lighting environments, ranging from natural sunlight to indoor artificial lighting.
+
+\section[Spoilage Stage Labelling Strategy]{\textbf{Spoilage Stage Labelling Strategy}}
+Since standard datasets often only provide binary labels, a rigorous labeling strategy was implemented. Each image was manually reviewed and cross-referenced with heuristic metrics to ensure objective classification:
+\begin{itemize}
+    \item \textbf{Color Distribution Analysis}: Mean RGB and HSV values were calculated to detect shifts from vibrant colors (Fresh) to darker or brownish tones (Spoilage).
+    \item \textbf{Darkness Ratio}: A thresholding algorithm was used to calculate the percentage of dark pixels, which often correlates with bruises or necrotic spots.
+    \item \textbf{Texture Roughness}: Laplacian variance was used to measure image sharpness and surface texture; a decrease in variance often indicates the loss of surface integrity and softening.
+\end{itemize}
+This multi-modal labeling approach ensures that the ground truth for training is highly reliable, allowing the model to distinguish subtle differences between 'Early' and 'Moderate' spoilage.
+
+\section[Image Pre-processing Techniques]{\textbf{Image Pre-processing Techniques}}
+To standardize the input for deep learning models, several preprocessing steps are executed:
+\begin{enumerate}
+    \item \textbf{Aspect-Aware Resizing}: Images are resized to $224 \times 224$ pixels using inter-linear interpolation. This specific resolution is the standard input size for the MobileNet and ResNet architectures, ensuring optimal feature map extraction.
+    \item \textbf{Channel Normalization}: Pixel values are scaled from $[0, 255]$ to $[0, 1]$ by dividing by 255.0. This prevents gradients from exploding and ensures faster convergence of the stochastic gradient descent (SGD) optimizer.
+    \item \textbf{Noise Reduction}: A $3 \times 3$ Gaussian blur kernel is applied to remove high-frequency noise that could otherwise lead the model to focus on irrelevant background details.
+\end{enumerate}
+
+\section[Data Augmentation Methods]{\textbf{Data Augmentation Methods}}
+To prevent overfitting and improve the generalization of the model to unseen household environments, a dynamic augmentation pipeline was implemented using the \textit{ImageDataGenerator} class. The following transformations are applied randomly during each training epoch:
+\begin{itemize}
+    \item \textbf{Rotation}: Random rotations between $-20^{\circ}$ and $+20^{\circ}$ to simulate different camera angles.
+    \item \textbf{Flipping}: Horizontal and vertical flips to account for orientation variance.
+    \item \textbf{Zoom and Shear}: Random zooming (range: 0.9 to 1.1) and shearing (range: 0.2) to simulate varying distances and perspective distortions.
+    \item \textbf{Brightness adjustment}: Scaling pixel intensity by a factor of 0.8 to 1.2 to account for diverse lighting conditions.
+\end{itemize}
+
+\section[Dataset Splitting and Balancing]{\textbf{Dataset Splitting and Balancing}}
+The dataset is split using a stratified approach to maintain the class distribution across all subsets:
+\begin{itemize}
+    \item \textbf{Training Set (70\%)}: Approximately 3,150 images used for updating weights.
+    \item \textbf{Validation Set (15\%)}: 675 images used for monitoring the loss curve and early stopping.
+    \item \textbf{Testing Set (15\%)}: 675 images reserved for the final unbiased evaluation of the system.
+\end{itemize}
+To address any minor class imbalances, \textit{Synthetic Minority Over-sampling Technique} (SMOTE) or class weighting was applied in the loss function, ensuring the model does not become biased toward the 'Fresh' or 'Severe' categories which often have more samples.
+
+\section[Tools, Frameworks, and Software Used]{\textbf{Tools, Frameworks, and Software Used}}
+The software stack is built entirely on Python 3.9:
+\begin{itemize}
+    \item \textbf{TensorFlow 2.x / Keras}: For building the multi-label classification models using the Functional API for complex architectures.
+    \item \textbf{OpenCV}: For all low-level image processing and real-time camera interfacing.
+    \item \textbf{Streamlit}: For the final deployment, providing a responsive UI for image uploads and real-time visualization of Grad-CAM heatmaps.
+    \item \textbf{Matplotlib \& Plotly}: For generating interactive training history logs and evaluation metrics like Confusion Matrices.
+\end{itemize}
+
+\section[Hardware and IoT Components Used]{\textbf{Hardware and IoT Components Used}}
+The physical component of the system integrates several key hardware pieces:
+\begin{itemize}
+    \item \textbf{MQ-135 Gas Sensor}: Capable of detecting Ammonia, Ethanol, and Smoke. It is calibrated by calculating the $R_0$ resistance in clean air to ensure accurate VOC detection.
+    \item \textbf{DHT22 Sensor}: Chosen over the DHT11 for its higher precision ($\pm 0.5^{\circ}C$ for temperature and $\pm 2\%$ for humidity) and wider sensing range.
+    \item \textbf{ESP32 Microcontroller}: A dual-core 240MHz processor with integrated WiFi/BLE, allowing for future expansion into cloud-based monitoring.
+    \item \textbf{Standard Peripherals}: Includes a 5V power supply, logic level shifters, and an external antenna for enhanced signal stability.
+\end{itemize}

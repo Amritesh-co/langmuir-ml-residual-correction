@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
+    <style>
+        .mermaid { display: flex; justify-content: center; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="mermaid">
+graph LR
+    Raw[Raw Images<br/>Kaggle/Open-Source] --> Lab[Labeling Strategy<br/>Heuristic + Manual]
+    Lab --> Stage[4 Spoilage Stages<br/>Fresh to Severe]
+    Stage --> Pre[Preprocessing<br/>Resize + Normalize]
+    Pre --> Aug[Augmentation<br/>Rotate, Flip, Zoom]
+    Aug --> Split[Dataset Splitting<br/>70% Train, 15% Val, 15% Test]
+    Split --> Train[Model Training<br/>Ready]
+
+    style Raw fill:#e1f5fe,stroke:#01579b
+    style Train fill:#e8f5e9,stroke:#2e7d32
+    style Stage fill:#fff3e0,stroke:#e65100
+    </div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+graph TD
+    Start([Start]) --> DataColl[Data Collection<br/>Images + IoT Sensor Data]
+    DataColl --> DataLab[Data Labeling<br/>Fresh, Early, Moderate, Severe]
+    DataLab --> DataPre[Data Preprocessing<br/>Resize, Normalize]
+    DataPre --> DataAug[Data Augmentation<br/>Rotate, Flip, Brightness]
+    DataAug --> ModelDev[Model Development<br/>CNN / MobileNetV2 / ResNet50]
+    ModelDev --> ModelEval[Model Evaluation<br/>Accuracy, Precision, Recall, F1]
+    ModelEval --> IoTData[IoT Data Acquisition<br/>MQ-135, DHT11]
+    IoTData --> PredSys[Prediction System<br/>Image + Sensor Input]
+    PredSys --> XAI[Explainable AI<br/>Grad-CAM Visualization]
+    XAI --> UI[User Interface<br/>Upload Image & View Result]
+    UI --> TestVal[Testing & Validation]
+    TestVal --> End([End])
+
+    style Start fill:#005bb7,color:#fff
+    style End fill:#005bb7,color:#fff
+    style DataColl fill:#fff,stroke:#005bb7
+    style DataLab fill:#fff,stroke:#005bb7
+    style DataPre fill:#fff,stroke:#005bb7
+    style DataAug fill:#fff,stroke:#005bb7
+    style ModelDev fill:#fff,stroke:#005bb7
+    style ModelEval fill:#fff,stroke:#005bb7
+    style IoTData fill:#fff,stroke:#005bb7
+    style PredSys fill:#fff,stroke:#005bb7
+    style XAI fill:#fff,stroke:#005bb7
+    style UI fill:#fff,stroke:#005bb7
+    style TestVal fill:#fff,stroke:#005bb7

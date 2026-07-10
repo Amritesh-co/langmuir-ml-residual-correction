@@ -1,0 +1,16 @@
+\addcontentsline{toc}{chapter}{Abstract}\vspace{-1cm}
+%Border
+\begin{tikzpicture}[remember picture, overlay]
+  \draw[line width = 4pt] ($(current page.north west) + (0.75in,-0.75in)$) rectangle ($(current page.south east) + (-0.75in,0.75in)$);
+\end{tikzpicture}
+
+
+%Highlights of significant contributions: One page with 3 to 4 paragraphs\\
+
+Food spoilage is a critical issue that affects both health and the economy. Conventional methods for food quality monitoring are often slow and subjective, necessitating more advanced and automated solutions. This project presents an AI-based multi-label food spoilage detection system using image analysis and IoT technology.
+
+The primary objective of this work is to develop a deep learning system capable of categorizing fruits and vegetables into four stages: Fresh, Early Spoilage, Moderate Spoilage, and Severe Spoilage. The system employs multiple deep learning architectures, including CNN, MobileNetV2, ResNet50, and EfficientNetB0, for image classification. Furthermore, it integrates IoT sensors such as MQ-135 and DHT11/DHT22 for real-time monitoring of gas concentration, temperature, and humidity, which significantly influence the spoilage process.
+
+A key feature of the proposed system is the implementation of Explainable AI (XAI) using Grad-CAM, which provides visual heatmaps to interpret the model's classification decisions. A web-based interface has been developed to provide real-time spoilage prediction, environmental data monitoring, and visualization. Preliminary results demonstrate high accuracy in classification across the four stages, and the integrated IoT platform enables continuous monitoring, thereby assisting in food waste reduction and ensuring food safety.
+
+\pagebreak

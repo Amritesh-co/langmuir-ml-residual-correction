@@ -1,0 +1,24 @@
+{
+  "source": "Real experimental CCD dataset (30 runs, Design-Expert)",
+  "factors_used": [
+    "pH",
+    "Dose",
+    "C0",
+    "Time"
+  ],
+  "n_samples": 30,
+  "model": "Full quadratic response surface (2nd-order polynomial regression)",
+  "n_terms": 14,
+  "in_sample": {
+    "r2": 0.9937094360512844,
+    "rmse": 0.34147450818723546,
+    "mae": 0.268026072124754,
+    "adj_r2": 0.9878382430324831
+  },
+  "loocv": {
+    "r2": 0.9672060708646975,
+    "rmse": 0.7796689236755374,
+    "mae": 0.5908991275460157
+  },
+  "note": "LOOCV R2 is the honest generalization metric given only 30 real samples; in-sample R2/Adj-R2 reflects RSM fit quality typical for CCD/ANOVA reporting."
+}

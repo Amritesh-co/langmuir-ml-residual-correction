@@ -26,31 +26,31 @@ from tqdm import tqdm
 # ============================================================================
 
 # Langmuir parameters for coconut husk AC + fluoride
-QMAX_REF = 8.5  # mg/g (Talat et al. 2018)
-KL_REF = 0.12   # L/mg at 25°C
-TEMP_REF = 25   # °C
-EA = 20.0       # kJ/mol
-R_GAS = 8.314   # J/(mol·K)
+QMAX_REF = 8.5 # mg/g (Talat et al. 2018)
+KL_REF = 0.12 # L/mg at 25°C
+TEMP_REF = 25 # °C
+EA = 20.0 # kJ/mol
+R_GAS = 8.314 # J/(mol·K)
 
 # pH effect (bell curve)
 PH_OPTIMAL = 6.5
 PH_WIDTH = 1.1
 
 # Kinetics
-K2_REF = 0.05   # g/(mg·min)
-EQUILIBRIUM_TIME_REF = 240  # minutes
+K2_REF = 0.05 # g/(mg·min)
+EQUILIBRIUM_TIME_REF = 240 # minutes
 
 # Ion competition parameters (CORRECTED - LESS AGGRESSIVE)
-SELECTIVITY_CL = 0.1   # Mild competition from Cl-
-SELECTIVITY_CA = 0.15  # Mild competition from Ca2+
-SELECTIVITY_MG = 0.12  # Mild competition from Mg2+
+SELECTIVITY_CL = 0.1 # Mild competition from Cl-
+SELECTIVITY_CA = 0.15 # Mild competition from Ca2+
+SELECTIVITY_MG = 0.12 # Mild competition from Mg2+
 SELECTIVITY_CO3 = 0.25 # Strongest but still moderate
 
 # NOM fouling (CORRECTED - WEAKER EFFECT)
-NOM_SATURATION = 100  # Higher saturation point (was 50)
+NOM_SATURATION = 100 # Higher saturation point (was 50)
 
 # Measurement noise
-MEASUREMENT_NOISE_STD = 0.05  # 5%
+MEASUREMENT_NOISE_STD = 0.05 # 5%
 
 # ============================================================================
 # CORRECTED SIMULATION FUNCTIONS
@@ -97,7 +97,7 @@ def kinetic_approach_to_equilibrium(t_minutes, qe, k2):
     """Pseudo-second-order kinetics"""
     denominator = 1.0 + qe * k2 * t_minutes
     qt = (qe ** 2 * k2 * t_minutes) / denominator
-    return np.minimum(qt, qe)  # Can't exceed equilibrium
+    return np.minimum(qt, qe) # Can't exceed equilibrium
 
 
 def ion_competition_effect_CORRECTED(Ce_F, Cl, Ca_Mg, CO3):
@@ -113,15 +113,15 @@ def ion_competition_effect_CORRECTED(Ce_F, Cl, Ca_Mg, CO3):
 
     # Linear reduction factors (much milder than before)
     # Each ion reduces capacity proportionally but not multiplicatively
-    cl_reduction = (Cl / 500) * 0.08  # Max 8% reduction at 100 mg/L
-    ca_mg_reduction = (Ca_Mg_equiv / 10) * 0.12  # Max 12% reduction at 500 mg/L
-    co3_reduction = (CO3 / 500) * 0.15  # Max 15% reduction at 100 mg/L
+    cl_reduction = (Cl / 500) * 0.08 # Max 8% reduction at 100 mg/L
+    ca_mg_reduction = (Ca_Mg_equiv / 10) * 0.12 # Max 12% reduction at 500 mg/L
+    co3_reduction = (CO3 / 500) * 0.15 # Max 15% reduction at 100 mg/L
 
     # Total reduction (additive, not multiplicative)
     total_reduction = cl_reduction + ca_mg_reduction + co3_reduction
 
     # Reduction factor stays in reasonable range
-    reduction_factor = 1.0 - np.clip(total_reduction, 0, 0.35)  # Max 35% loss
+    reduction_factor = 1.0 - np.clip(total_reduction, 0, 0.35) # Max 35% loss
 
     return reduction_factor
 
@@ -133,9 +133,9 @@ def nom_fouling_effect_CORRECTED(NOM_conc):
     Effects: 0 mg/L NOM = no loss, 50 mg/L NOM = ~10% loss, 100 mg/L = ~15% loss
     """
     # Linear relationship (simpler and more realistic)
-    fouling_reduction = (NOM_conc / NOM_SATURATION) * 0.15  # Max 15% at saturation
+    fouling_reduction = (NOM_conc / NOM_SATURATION) * 0.15 # Max 15% at saturation
 
-    reduction_factor = 1.0 - np.clip(fouling_reduction, 0, 0.25)  # Max 25% loss
+    reduction_factor = 1.0 - np.clip(fouling_reduction, 0, 0.25) # Max 25% loss
 
     return reduction_factor
 
@@ -266,38 +266,38 @@ def print_parameters():
     print("="*80)
 
     print(f"\nLangmuir Parameters:")
-    print(f"  qmax (reference):     {QMAX_REF} mg/g")
-    print(f"  KL (reference):       {KL_REF} L/mg")
-    print(f"  Reference temp:       {TEMP_REF}°C")
+    print(f" qmax (reference): {QMAX_REF} mg/g")
+    print(f" KL (reference): {KL_REF} L/mg")
+    print(f" Reference temp: {TEMP_REF}°C")
 
     print(f"\nKinetic Parameters:")
-    print(f"  k2 (reference):       {K2_REF} g/(mg·min)")
+    print(f" k2 (reference): {K2_REF} g/(mg·min)")
 
     print(f"\nThermodynamic Parameters:")
-    print(f"  Activation energy:    {EA} kJ/mol")
+    print(f" Activation energy: {EA} kJ/mol")
 
     print(f"\nCORRECTED Ion Competition (Realistic Effects):")
-    print(f"  Chloride (Cl-):       {SELECTIVITY_CL} (5-10% reduction)")
-    print(f"  Calcium (Ca2+):       {SELECTIVITY_CA} (8-15% reduction)")
-    print(f"  Magnesium (Mg2+):     {SELECTIVITY_MG} (7-12% reduction)")
-    print(f"  Carbonate (CO3--):    {SELECTIVITY_CO3} (10-20% reduction)")
-    print(f"  Total ion effect:     15-30% max")
+    print(f" Chloride (Cl-): {SELECTIVITY_CL} (5-10% reduction)")
+    print(f" Calcium (Ca2+): {SELECTIVITY_CA} (8-15% reduction)")
+    print(f" Magnesium (Mg2+): {SELECTIVITY_MG} (7-12% reduction)")
+    print(f" Carbonate (CO3--): {SELECTIVITY_CO3} (10-20% reduction)")
+    print(f" Total ion effect: 15-30% max")
 
     print(f"\nCORRECTED NOM Fouling (Realistic):")
-    print(f"  Saturation point:     {NOM_SATURATION} mg/L")
-    print(f"  Max reduction:        15-20% (was 80%)")
+    print(f" Saturation point: {NOM_SATURATION} mg/L")
+    print(f" Max reduction: 15-20% (was 80%)")
 
     print(f"\nMeasurement Noise:")
-    print(f"  Relative std dev:     {MEASUREMENT_NOISE_STD*100:.1f}%")
+    print(f" Relative std dev: {MEASUREMENT_NOISE_STD*100:.1f}%")
 
 
 def print_completion():
     """Print completion message"""
     print("\n" + "="*80)
-    print("✓ CORRECTED SIMULATION COMPLETE")
+    print(" CORRECTED SIMULATION COMPLETE")
     print("="*80)
     print("\nFiles created:")
-    print("  - data/dataset_simulated_500.csv")
+    print(" - data/dataset_simulated_500.csv")
     print("\nExpected q_removal range: 0.2-8.0 mg/g (realistic)")
     print("Next: Proceed to Phase 2 (Langmuir fitting)")
     print("="*80 + "\n")
@@ -320,20 +320,20 @@ def main():
         return None
 
     df = pd.read_csv('data/doe_lhs_500.csv')
-    print(f"    ✓ Loaded {len(df)} design points")
+    print(f" Loaded {len(df)} design points")
 
     # Run corrected simulation
     print(f"\n[2/3] Running CORRECTED simulation...")
-    print(f"    This uses realistic mechanism implementations...")
+    print(f" This uses realistic mechanism implementations...")
 
     responses = []
-    for idx, row in tqdm(df.iterrows(), total=len(df), desc="    Simulating"):
+    for idx, row in tqdm(df.iterrows(), total=len(df), desc=" Simulating"):
         q_removal = simulate_fluoride_removal_CORRECTED(row)
         responses.append(q_removal)
 
     df['q_removal'] = responses
 
-    print(f"    ✓ Simulation complete")
+    print(f" Simulation complete")
 
     # Save results
     print(f"\n[3/3] Saving CORRECTED simulated dataset...")
@@ -341,28 +341,28 @@ def main():
     df.to_csv('data/dataset_simulated_500.csv', index=False)
 
     file_size = os.path.getsize('data/dataset_simulated_500.csv') / 1024
-    print(f"    ✓ Saved to: data/dataset_simulated_500.csv")
-    print(f"    ✓ File size: {file_size:.1f} KB")
-    print(f"    ✓ Rows: {len(df)}")
+    print(f" Saved to: data/dataset_simulated_500.csv")
+    print(f" File size: {file_size:.1f} KB")
+    print(f" Rows: {len(df)}")
 
     # Print statistics
     print(f"\nCORRECTED Response Statistics (q_removal in mg/g):")
     q_removal = df['q_removal']
-    print(f"  Min:        {q_removal.min():.2f} mg/g")
-    print(f"  Max:        {q_removal.max():.2f} mg/g")
-    print(f"  Mean:       {q_removal.mean():.2f} mg/g")
-    print(f"  Median:     {q_removal.median():.2f} mg/g")
-    print(f"  Std Dev:    {q_removal.std():.2f} mg/g")
-    print(f"  Q1 (25%):   {q_removal.quantile(0.25):.2f} mg/g")
-    print(f"  Q3 (75%):   {q_removal.quantile(0.75):.2f} mg/g")
+    print(f" Min: {q_removal.min():.2f} mg/g")
+    print(f" Max: {q_removal.max():.2f} mg/g")
+    print(f" Mean: {q_removal.mean():.2f} mg/g")
+    print(f" Median: {q_removal.median():.2f} mg/g")
+    print(f" Std Dev: {q_removal.std():.2f} mg/g")
+    print(f" Q1 (25%): {q_removal.quantile(0.25):.2f} mg/g")
+    print(f" Q3 (75%): {q_removal.quantile(0.75):.2f} mg/g")
 
     # Check distribution
     print(f"\nValue Distribution:")
-    print(f"  0.1-1.0 mg/g:   {((q_removal >= 0.1) & (q_removal < 1.0)).sum()} ({((q_removal >= 0.1) & (q_removal < 1.0)).sum()/len(q_removal)*100:.1f}%)")
-    print(f"  1.0-3.0 mg/g:   {((q_removal >= 1.0) & (q_removal < 3.0)).sum()} ({((q_removal >= 1.0) & (q_removal < 3.0)).sum()/len(q_removal)*100:.1f}%)")
-    print(f"  3.0-5.0 mg/g:   {((q_removal >= 3.0) & (q_removal < 5.0)).sum()} ({((q_removal >= 3.0) & (q_removal < 5.0)).sum()/len(q_removal)*100:.1f}%)")
-    print(f"  5.0-7.0 mg/g:   {((q_removal >= 5.0) & (q_removal < 7.0)).sum()} ({((q_removal >= 5.0) & (q_removal < 7.0)).sum()/len(q_removal)*100:.1f}%)")
-    print(f"  7.0-8.5 mg/g:   {(q_removal >= 7.0).sum()} ({(q_removal >= 7.0).sum()/len(q_removal)*100:.1f}%)")
+    print(f" 0.1-1.0 mg/g: {((q_removal >= 0.1) & (q_removal < 1.0)).sum()} ({((q_removal >= 0.1) & (q_removal < 1.0)).sum()/len(q_removal)*100:.1f}%)")
+    print(f" 1.0-3.0 mg/g: {((q_removal >= 1.0) & (q_removal < 3.0)).sum()} ({((q_removal >= 1.0) & (q_removal < 3.0)).sum()/len(q_removal)*100:.1f}%)")
+    print(f" 3.0-5.0 mg/g: {((q_removal >= 3.0) & (q_removal < 5.0)).sum()} ({((q_removal >= 3.0) & (q_removal < 5.0)).sum()/len(q_removal)*100:.1f}%)")
+    print(f" 5.0-7.0 mg/g: {((q_removal >= 5.0) & (q_removal < 7.0)).sum()} ({((q_removal >= 5.0) & (q_removal < 7.0)).sum()/len(q_removal)*100:.1f}%)")
+    print(f" 7.0-8.5 mg/g: {(q_removal >= 7.0).sum()} ({(q_removal >= 7.0).sum()/len(q_removal)*100:.1f}%)")
 
     print_completion()
 
@@ -372,10 +372,10 @@ def main():
 if __name__ == '__main__':
     try:
         dataset = main()
-        print("\n✓ CORRECTED simulation completed successfully!")
+        print("\n CORRECTED simulation completed successfully!")
         sys.exit(0)
     except Exception as e:
-        print(f"\n✗ Error: {e}", file=sys.stderr)
+        print(f"\n Error: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
         sys.exit(1)

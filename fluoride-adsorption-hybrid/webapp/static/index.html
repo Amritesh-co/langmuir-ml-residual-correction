@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fluoride Adsorption Hybrid Models</title>
+<meta name="description" content="Interactive dashboard for physics-informed hybrid machine-learning models predicting fluoride removal from water, comparing a 24-parameter and a 4-parameter model."/>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          primary: "#3B82F6",
+          "primary-dark": "#2563EB",
+          secondary: "#F59E0B",
+          "surface-low": "#111A2C",
+          "surface-high": "#1E293B",
+          outline: "#293548",
+          "on-surface-variant": "#94A3B8",
+          "on-surface": "#E2E8F0",
+          good: "#34D3B8",
+        },
+        fontFamily: {
+          sans: ["Inter", "sans-serif"],
+          mono: ["JetBrains Mono", "monospace"],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  body { background: #0A0F1A; font-family: 'Inter', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+  .card { background: #131C2E; border: 1px solid #1E293B; border-radius: 0.75rem;
+          box-shadow: 0px 4px 10px -2px rgba(0,0,0,0.4), 0px 2px 4px -2px rgba(0,0,0,0.3); }
+  .instrument-input { border: 1px solid #334155; background: #0C1424; color: #E2E8F0; border-radius: 0.375rem; padding: 0.5rem 0.75rem;
+                       font-family: 'JetBrains Mono', monospace; font-size: 14px; outline: none; transition: all .15s; width: 100%; }
+  .instrument-input:focus { border-color: #3B82F6; box-shadow: 0 0 0 2px rgba(59,130,246,0.25); }
+  .tab-btn { padding: 14px 4px; font-weight: 600; color: #94A3B8; border-bottom: 2px solid transparent;
+             display: flex; align-items: center; gap: 6px; cursor: pointer; transition: color .15s, border-color .15s; }
+  .tab-btn.active { color: #60A5FA; border-bottom-color: #F59E0B; }
+  .tab-btn:hover { color: #60A5FA; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .gauge-wrap { position: relative; width: 260px; height: 130px; overflow: hidden; }
+  .gauge-bg { position: absolute; width: 260px; height: 260px; border: 22px solid #1E293B; border-radius: 50%; clip-path: inset(0 0 50% 0); }
+  .gauge-fill { position: absolute; width: 260px; height: 260px; border: 22px solid transparent;
+                border-bottom-color: #3B82F6; border-left-color: #3B82F6; border-radius: 50%;
+                clip-path: inset(0 0 50% 0); transform: rotate(45deg); transition: transform 0.9s cubic-bezier(0.34,1.56,0.64,1); }
+  .breakdown-bar { height: 28px; background: #1E293B; border-radius: 6px; overflow: hidden; }
+  .breakdown-fill { height: 100%; transition: width 0.6s ease; }
+  #toast { position: fixed; bottom: 24px; right: 24px; background: #1E293B; color: #E2E8F0; padding: 10px 18px;
+           border: 1px solid #334155; border-radius: 8px; font-size: 13px; opacity: 0; transform: translateY(10px); transition: all .25s; pointer-events: none; z-index: 100; }
+  #toast.show { opacity: 1; transform: translateY(0); }
+
+  /* Interactive particle-network background */
+  #bg-canvas { position: fixed; inset: 0; z-index: 0; display: block; }
+  main, header, nav { position: relative; z-index: 1; }
+</style>
+</head>
+<body class="text-on-surface">
+
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+<header class="bg-gradient-to-r from-primary to-blue-500 text-white px-8 py-6 shadow-md">
+  <h1 class="text-2xl font-bold tracking-tight">Fluoride Adsorption Hybrid Models</h1>
+  <p class="text-blue-100 text-sm mt-1">Physics-informed baseline + machine-learning residual correction for predicting fluoride removal from water</p>
+</header>
+
+<nav class="bg-[#0D1524] border-b border-outline px-8 flex gap-8 sticky top-0 z-40">
+  <div class="tab-btn active" data-tab="tab24" onclick="switchTab('tab24', this)">
+    <span class="material-symbols-outlined text-[20px]">science</span> 24-Parameter Model
+  </div>
+  <div class="tab-btn" data-tab="tab4" onclick="switchTab('tab4', this)">
+    <span class="material-symbols-outlined text-[20px]">analytics</span> 4-Parameter Model
+  </div>
+  <div class="tab-btn" data-tab="tabCompare" onclick="switchTab('tabCompare', this)">
+    <span class="material-symbols-outlined text-[20px]">compare_arrows</span> Model Comparison
+  </div>
+</nav>
+
+<main class="max-w-[1400px] mx-auto px-8 py-6">
+
+  <!-- ================= TAB 1: 24-Parameter ================= -->
+  <section id="tab24" class="tab-panel active">
+    <p class="text-sm text-on-surface-variant mb-4">Full water-chemistry model &rarr; <b>q_removal (mg/g)</b>. Trained on 500 simulated samples.</p>
+    <div class="grid grid-cols-12 gap-6">
+      <div class="col-span-12 lg:col-span-5 space-y-6">
+        <section class="card overflow-hidden">
+          <header class="px-5 py-3 border-b border-outline bg-surface-low flex justify-between items-center">
+            <h2 class="text-primary font-semibold flex items-center gap-2">
+              <span class="material-symbols-outlined text-[20px]">settings_input_component</span> Process Conditions
+            </h2>
+          </header>
+          <div class="p-5 grid grid-cols-2 gap-4">
+            <div><label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide" for="f_pH">pH (3.0–9.0)</label>
+              <input id="f_pH" class="instrument-input" type="number" step="0.1" value="6.5"/></div>
+            <div><label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide" for="f_C0">Initial F&#8315;, C0 mg/L (1–10)</label>
+              <input id="f_C0" class="instrument-input" type="number" step="0.1" value="5"/></div>
+            <div><label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide" for="f_Time">Contact Time, min (10–120)</label>
+              <input id="f_Time" class="instrument-input" type="number" step="1" value="60"/></div>
+            <div><label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide" for="f_Dose">Dose, g/L (0.5–5.0)</label>
+              <input id="f_Dose" class="instrument-input" type="number" step="0.1" value="2"/></div>
+            <div><label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide" for="f_Temp">Temperature, °C (20–40)</label>
+              <input id="f_Temp" class="instrument-input" type="number" step="0.5" value="30"/></div>
+            <div><label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide" for="f_Flow">Flow Rate (0.5–2.0)</label>
+              <input id="f_Flow" class="instrument-input" type="number" step="0.05" value="1"/></div>
+          </div>
+        </section>
+        <section class="card overflow-hidden">
+          <header class="px-5 py-3 border-b border-outline bg-surface-low flex justify-between items-center">
+            <h2 class="text-primary font-semibold flex items-center gap-2">
+              <span class="material-symbols-outlined text-[20px]">water_drop</span> Water Chemistry
+            </h2>
+            <span class="text-[11px] font-semibold text-secondary bg-amber-500/10 px-2 py-1 rounded border border-amber-500/30">ML Features</span>
+          </header>
+          <div class="p-5 grid grid-cols-2 gap-4">
+            <div><label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide" for="f_Chloride">Chloride, mg/L (0–100)</label>
+              <input id="f_Chloride" class="instrument-input" type="number" step="1" value="20"/></div>
+            <div><label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide" for="f_Hardness">Hardness, mg/L (1–500)</label>
+              <input id="f_Hardness" class="instrument-input" type="number" step="1" value="150"/></div>
+            <div><label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide" for="f_Carbonate">Carbonate, mg/L (0–100)</label>
+              <input id="f_Carbonate" class="instrument-input" type="number" step="1" value="20"/></div>
+            <div><label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide" for="f_NOM">NOM, mg/L (0–50)</label>
+              <input id="f_NOM" class="instrument-input" type="number" step="1" value="10"/></div>
+          </div>
+        </section>
+        <button type="button" onclick="predict24()" id="btn24" class="w-full bg-primary-dark text-white py-4 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-primary transition-colors shadow-md">
+          <span class="material-symbols-outlined">bolt</span> Predict Hybrid Performance
+        </button>
+      </div>
+
+      <div class="col-span-12 lg:col-span-7">
+        <div class="card h-full flex flex-col">
+          <header class="px-5 py-3 border-b border-outline bg-surface-low">
+            <h2 class="text-primary font-semibold flex items-center gap-2">
+              <span class="material-symbols-outlined text-[20px]">query_stats</span> Hybrid Model Predictions
+            </h2>
+          </header>
+          <div class="flex-grow flex flex-col items-center justify-center p-6 gap-6">
+            <div class="flex flex-col items-center">
+              <div class="gauge-wrap mb-1">
+                <div class="gauge-bg"></div>
+                <div class="gauge-fill" id="gauge24"></div>
+                <div class="absolute inset-0 flex flex-col items-center justify-end pb-2">
+                  <span class="text-3xl font-bold text-primary" id="val24">6.45</span>
+                  <span class="text-xs text-on-surface-variant uppercase tracking-widest">mg/g</span>
+                </div>
+              </div>
+              <p class="text-xs text-on-surface-variant uppercase tracking-widest">Predicted q_removal</p>
+            </div>
+
+            <div class="w-full max-w-md space-y-3">
+              <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Prediction Breakdown</h3>
+              <div>
+                <div class="flex justify-between text-xs text-on-surface-variant mb-1"><span>Langmuir Baseline</span><span class="font-mono" id="b24_base">5.12 mg/g</span></div>
+                <div class="breakdown-bar"><div class="breakdown-fill bg-slate-400" id="bar24_base" style="width:79%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs text-secondary mb-1"><span>Residual ML Correction</span><span class="font-mono" id="b24_res">+1.33 mg/g</span></div>
+                <div class="breakdown-bar"><div class="breakdown-fill bg-secondary" id="bar24_res" style="width:21%"></div></div>
+              </div>
+              <div class="pt-2 border-t border-outline">
+                <div class="flex justify-between text-xs text-primary font-semibold mb-1"><span>Hybrid Final Result</span><span class="font-mono" id="b24_final">6.45 mg/g</span></div>
+                <div class="breakdown-bar" style="height:36px"><div class="breakdown-fill bg-primary" id="bar24_final" style="width:100%"></div></div>
+              </div>
+            </div>
+
+            <div class="mt-auto pt-4 border-t border-outline w-full flex justify-center gap-8">
+              <div class="flex items-center gap-2"><span class="text-xs text-slate-400 uppercase">R&sup2;</span><span class="font-mono text-blue-300 bg-blue-500/15 px-2 py-1 rounded">0.942</span></div>
+              <div class="flex items-center gap-2"><span class="text-xs text-slate-400 uppercase">RMSE</span><span class="font-mono text-amber-300 bg-amber-500/15 px-2 py-1 rounded">0.297 mg/g</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TAB 2: 4-Parameter ================= -->
+  <section id="tab4" class="tab-panel">
+    <p class="text-sm text-on-surface-variant mb-4">Reduced, field-deployable model &rarr; <b>% fluoride removal</b>. Trained on 30 real CCD runs + 170 generated points.</p>
+    <div class="grid grid-cols-12 gap-6">
+      <div class="col-span-12 lg:col-span-5 space-y-6">
+        <section class="card overflow-hidden">
+          <header class="px-5 py-3 border-b border-outline bg-surface-low">
+            <h2 class="text-primary font-semibold flex items-center gap-2">
+              <span class="material-symbols-outlined text-[20px]">tune</span> Inputs
+            </h2>
+          </header>
+          <div class="p-5 grid grid-cols-2 gap-4">
+            <div><label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide" for="g_pH">pH (2.0–7.0)</label>
+              <input id="g_pH" class="instrument-input" type="number" step="0.1" value="4.5"/></div>
+            <div><label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide" for="g_Dose">Dose, g/100mL (0.1–1.0)</label>
+              <input id="g_Dose" class="instrument-input" type="number" step="0.01" value="0.55"/></div>
+            <div><label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide" for="g_C0">Initial F&#8315;, ppm (2–70)</label>
+              <input id="g_C0" class="instrument-input" type="number" step="0.5" value="36"/></div>
+            <div><label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide" for="g_Time">Contact Time, min (30–180)</label>
+              <input id="g_Time" class="instrument-input" type="number" step="1" value="105"/></div>
+          </div>
+        </section>
+        <button type="button" onclick="predict4()" id="btn4" class="w-full bg-[#1B7A6B] text-white py-4 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-good transition-colors shadow-md">
+          <span class="material-symbols-outlined">bolt</span> Predict Fluoride Removal
+        </button>
+      </div>
+
+      <div class="col-span-12 lg:col-span-7">
+        <div class="card h-full flex flex-col">
+          <header class="px-5 py-3 border-b border-outline bg-surface-low">
+            <h2 class="text-primary font-semibold flex items-center gap-2">
+              <span class="material-symbols-outlined text-[20px]">query_stats</span> RSM Model Prediction
+            </h2>
+          </header>
+          <div class="flex-grow flex flex-col items-center justify-center p-6 gap-6">
+            <div class="flex flex-col items-center">
+              <div class="gauge-wrap mb-1">
+                <div class="gauge-bg"></div>
+                <div class="gauge-fill" id="gauge4" style="border-bottom-color:#2A9D8F; border-left-color:#2A9D8F;"></div>
+                <div class="absolute inset-0 flex flex-col items-center justify-end pb-2">
+                  <span class="text-3xl font-bold text-good" id="val4">73.9</span>
+                  <span class="text-xs text-on-surface-variant uppercase tracking-widest">%</span>
+                </div>
+              </div>
+              <p class="text-xs text-on-surface-variant uppercase tracking-widest">Predicted Fluoride Removal</p>
+            </div>
+
+            <div class="w-full max-w-md space-y-3">
+              <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Prediction Breakdown</h3>
+              <div>
+                <div class="flex justify-between text-xs text-good mb-1"><span>RSM Baseline (used as final)</span><span class="font-mono" id="b4_base">73.95%</span></div>
+                <div class="breakdown-bar"><div class="breakdown-fill bg-good" id="bar4_base" style="width:100%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs text-on-surface-variant mb-1"><span>Residual ML (not used)</span><span class="font-mono" id="b4_res">+0.02%</span></div>
+                <div class="breakdown-bar"><div class="breakdown-fill bg-slate-400" id="bar4_res" style="width:1%"></div></div>
+              </div>
+            </div>
+            <p class="text-xs text-on-surface-variant text-center max-w-md">Residual ML did not generalize on this dataset (OOF R&sup2; &lt; 0), so the RSM baseline alone is the reported final model.</p>
+
+            <div class="mt-auto pt-4 border-t border-outline w-full flex justify-center gap-8">
+              <div class="flex items-center gap-2"><span class="text-xs text-slate-400 uppercase">R&sup2;</span><span class="font-mono text-emerald-300 bg-emerald-500/15 px-2 py-1 rounded">0.826</span></div>
+              <div class="flex items-center gap-2"><span class="text-xs text-slate-400 uppercase">RMSE</span><span class="font-mono text-amber-300 bg-amber-500/15 px-2 py-1 rounded">0.97 %</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TAB 3: Comparison ================= -->
+  <section id="tabCompare" class="tab-panel">
+    <h2 class="text-lg font-bold text-on-surface mb-4">24-Parameter vs 4-Parameter</h2>
+    <div class="card p-5 mb-6">
+      <canvas id="compareChart" height="90"></canvas>
+    </div>
+    <div class="card overflow-hidden mb-6">
+      <table class="w-full text-sm">
+        <thead class="bg-surface-low text-on-surface-variant text-xs uppercase tracking-wide border-b border-outline">
+          <tr>
+            <th class="text-left px-4 py-3">Model</th><th class="text-left px-4 py-3">Dataset</th>
+            <th class="text-left px-4 py-3">Response</th><th class="text-right px-4 py-3">Baseline R&sup2;</th>
+            <th class="text-right px-4 py-3">Residual ML R&sup2;</th><th class="text-right px-4 py-3">Final R&sup2;</th>
+            <th class="text-right px-4 py-3">Final RMSE</th>
+          </tr>
+        </thead>
+        <tbody id="compareTable" class="font-mono"></tbody>
+      </table>
+    </div>
+    <div class="card p-5 mb-6">
+      <h3 class="font-semibold text-primary mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">lightbulb</span> Key Takeaways</h3>
+      <ul class="list-disc list-inside space-y-2 text-sm text-on-surface-variant">
+        <li>The <b>24-parameter model</b> meets the project's &ge;0.94 R&sup2; target using all 10 water-chemistry factors + 14 engineered features.</li>
+        <li>The <b>4-parameter model</b> trades some accuracy for practicality — using only pH, Dose, Initial F&#8315; Concentration, and Contact Time, the variables cheapest to measure/control in the field.</li>
+        <li>On the same simulated dataset (controlled ablation), dropping the 6 secondary factors costs about <b>0.05 R&sup2;</b> — because those factors are statistically independent (LHS design) of the 4 kept ones.</li>
+        <li>The current 4-parameter model is validated on <b>real experimental data</b> (15% of its training set), giving it direct lab credibility the 24-parameter model (fully simulated) does not have.</li>
+      </ul>
+    </div>
+    <h3 class="font-semibold text-on-surface mb-3">Reference Figures</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="card p-3"><img src="/images/24para/fig6_hybrid_results.png" class="w-full rounded" alt="24-Parameter: Predicted vs Actual"/></div>
+      <div class="card p-3"><img src="/images/4para/result/fig9_4param_combined_results.png" class="w-full rounded" alt="4-Parameter: Predicted vs Actual"/></div>
+    </div>
+  </section>
+
+</main>
+
+<div id="toast"></div>
+
+<script src="/static/bg.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

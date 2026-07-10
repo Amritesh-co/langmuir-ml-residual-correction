@@ -1,0 +1,37 @@
+{
+  "dataset": "combined_dataset_200.csv (30 real CCD + 170 mechanistically-generated points, independent of the RSM used here)",
+  "factors_used": [
+    "pH",
+    "Dose",
+    "C0",
+    "Time"
+  ],
+  "n_samples": 200,
+  "n_real": 30,
+  "n_generated": 170,
+  "n_residual_features": 16,
+  "residual_model": "Stacking(XGBoost+RandomForest+GradientBoosting)->RidgeCV",
+  "validation": "5-fold cross-validated out-of-fold on 200 samples",
+  "baseline_rsm": {
+    "r2": 0.8257206720605089,
+    "rmse": 0.973278809102075,
+    "mae": 0.7347673994698605
+  },
+  "residual_oof": {
+    "r2": -0.14644322343199456,
+    "rmse": 1.0421099523134107,
+    "mae": 0.7822728664805393
+  },
+  "hybrid_oof": {
+    "r2": 0.8001986454994882,
+    "rmse": 1.0421099523134107,
+    "mae": 0.7822728664805393
+  },
+  "final_model_used": "rsm_baseline_only",
+  "final_oof": {
+    "r2": 0.8257206720605089,
+    "rmse": 0.973278809102075,
+    "mae": 0.7347673994698605
+  },
+  "note": "Residual ML stage did not generalize (OOF R2 <= 0) so the RSM baseline alone is reported as the final model."
+}

@@ -1,8 +1,8 @@
-# 🎯 Fluoride Adsorption Hybrid Model — PROJECT STATUS
+# Fluoride Adsorption Hybrid Model — PROJECT STATUS
 
-**Date:** May 6, 2026  
-**Status:** 3 of 8 Phases Complete (37.5%)  
-**Overall Progress:** ✅ ON TRACK
+**Date:** May 6, 2026
+**Status:** 3 of 8 Phases Complete (37.5%)
+**Overall Progress:** ON TRACK
 
 ---
 
@@ -12,7 +12,7 @@ A hybrid physics-ML model for fluoride removal prediction combining Langmuir ads
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| **Current R²** | **0.8158** | ≥0.94 | Baseline established ✅ |
+| **Current R²** | **0.8158** | ≥0.94 | Baseline established |
 | **RMSE** | 0.5278 mg/g | <0.35 mg/g | Baseline excellent |
 | **Phase Progress** | 3/8 (37.5%) | 8/8 (100%) | On schedule |
 | **Residual learning** | 47.3% (Quick RF) | ≥70% | Phase 4 focus |
@@ -21,25 +21,25 @@ A hybrid physics-ML model for fluoride removal prediction combining Langmuir ads
 
 ## Phase Summary
 
-### ✅ PHASE 1: Research & Experimental Design (Complete)
+### PHASE 1: Research & Experimental Design (Complete)
 - **Goal:** Establish scientific foundation via literature review and experimental design
 - **Completion:** 100%
 - **Key Outputs:**
   - 10 validated experimental factors selected (pH, C₀, Time, Dose, Temp, Flow, Cl⁻, Hardness, CO₃²⁻, NOM)
   - 500-point LHS design matrix generated
   - Physics-based simulation with corrected bug (0 values < 1.0 mg/g)
-  - Simulated dataset range: 1.42–8.32 mg/g (realistic ✓)
+  - Simulated dataset range: 1.42–8.32 mg/g (realistic )
 - **Files:**
   - `data/processed/doe_lhs_500.csv`
   - `data/processed/dataset_simulated_500.csv`
   - `src/phase1_doe_design.py`
   - `src/phase1_simulate_adsorption.py`
 
-### ✅ PHASE 2: Langmuir Baseline Model (Complete)
+### PHASE 2: Langmuir Baseline Model (Complete)
 - **Goal:** Develop multi-factor polynomial Langmuir baseline model
 - **Completion:** 100%
 - **Key Metrics:**
-  - R² = **0.8158** (81.58% variance explained) ⭐ EXCELLENT
+  - R² = **0.8158** (81.58% variance explained) EXCELLENT
   - RMSE = 0.5278 mg/g (7.9% of data range — far better than expected)
   - MAE = 0.4282 mg/g
   - Residual mean = 0 (mathematically perfect unbiasedness)
@@ -53,7 +53,7 @@ A hybrid physics-ML model for fluoride removal prediction combining Langmuir ads
   - `results/phase2/langmuir_diagnostics.png`
   - `src/phase2_langmuir_fitting.py`
 
-### ✅ PHASE 3: Residual Analysis & Feature Engineering (Complete)
+### PHASE 3: Residual Analysis & Feature Engineering (Complete)
 - **Goal:** Identify and engineer learnable patterns in Langmuir residuals
 - **Completion:** 100%
 - **Key Findings:**
@@ -82,12 +82,12 @@ A hybrid physics-ML model for fluoride removal prediction combining Langmuir ads
 - **Output:** 3 trained models (RF, XGB, MLP) with hyperparameter tuning
 - **Expected Duration:** 2–3 hours
 
-### 🔄 PHASE 5: Hybrid Model Integration (After Phase 4)
+### PHASE 5: Hybrid Model Integration (After Phase 4)
 - **Goal:** Combine Langmuir + ML predictions into single ensemble
 - **Formula:** `q_final = q_Langmuir + q_ML_correction`
 - **Target:** Verify R² ≥ 0.94 on full 500-sample dataset
 
-### 📊 PHASES 6–8: Validation, Documentation, Deployment (Planned)
+### PHASES 6–8: Validation, Documentation, Deployment (Planned)
 - **Phase 6:** External validation (literature comparison, sensitivity analysis)
 - **Phase 7:** Production documentation and code release
 - **Phase 8:** Web deployment and API packaging
@@ -99,44 +99,44 @@ A hybrid physics-ML model for fluoride removal prediction combining Langmuir ads
 ```
 fluoride-adsorption-hybrid/
 │
-├── 🔧 src/                          Python scripts
-│   ├── phase1_doe_design.py          LHS design generation
-│   ├── phase1_simulate_adsorption.py Simulation (corrected)
-│   └── phase2_langmuir_fitting.py    Langmuir baseline model
-│   [phase4_ml_training.py — TO CREATE]
-│   [phase5_hybrid_integration.py — TO CREATE]
+├── src/ Python scripts
+│ ├── phase1_doe_design.py LHS design generation
+│ ├── phase1_simulate_adsorption.py Simulation (corrected)
+│ └── phase2_langmuir_fitting.py Langmuir baseline model
+│ [phase4_ml_training.py — TO CREATE]
+│ [phase5_hybrid_integration.py — TO CREATE]
 │
-├── 📊 data/
-│   ├── raw/                          Reference data
-│   │   └── literature_data_extraction.csv
-│   └── processed/                    Project data
-│       ├── doe_lhs_500.csv          (500 × 12)
-│       ├── dataset_simulated_500.csv (500 × 13)
-│       └── dataset_simulated_500_CORRECTED.csv (backup)
+├── data/
+│ ├── raw/ Reference data
+│ │ └── literature_data_extraction.csv
+│ └── processed/ Project data
+│ ├── doe_lhs_500.csv (500 × 12)
+│ ├── dataset_simulated_500.csv (500 × 13)
+│ └── dataset_simulated_500_CORRECTED.csv (backup)
 │
-├── 📈 results/
-│   ├── phase2/                       Langmuir outputs
-│   │   ├── langmuir_predictions.csv  (500 × 15) ← Input for Phase 3
-│   │   ├── langmuir_model_info.json
-│   │   └── langmuir_diagnostics.png
-│   ├── phase3/                       Residual analysis outputs
-│   │   ├── ml_training_data.csv     (400 × 39) ← Input for Phase 4
-│   │   ├── ml_test_data.csv         (100 × 39) ← Validation for Phase 4
-│   │   ├── feature_importance.csv
-│   │   ├── residual_analysis.json
-│   │   └── phase3_diagnostics.png
-│   ├── phase4/                       ML model outputs (EMPTY — ready)
-│   └── phase5/                       Hybrid integration (EMPTY — ready)
+├── results/
+│ ├── phase2/ Langmuir outputs
+│ │ ├── langmuir_predictions.csv (500 × 15) ← Input for Phase 3
+│ │ ├── langmuir_model_info.json
+│ │ └── langmuir_diagnostics.png
+│ ├── phase3/ Residual analysis outputs
+│ │ ├── ml_training_data.csv (400 × 39) ← Input for Phase 4
+│ │ ├── ml_test_data.csv (100 × 39) ← Validation for Phase 4
+│ │ ├── feature_importance.csv
+│ │ ├── residual_analysis.json
+│ │ └── phase3_diagnostics.png
+│ ├── phase4/ ML model outputs (EMPTY — ready)
+│ └── phase5/ Hybrid integration (EMPTY — ready)
 │
-├── 📓 notebooks/                     Jupyter notebooks (empty — optional)
+├── notebooks/ Jupyter notebooks (empty — optional)
 │
-├── 📝 Documentation
-│   ├── README.md                     Quick start guide
-│   ├── PROJECT_STATUS.md            This file
-│   ├── requirements.txt             Python dependencies
-│   └── .gitignore                   Git exclusions
+├── Documentation
+│ ├── README.md Quick start guide
+│ ├── PROJECT_STATUS.md This file
+│ ├── requirements.txt Python dependencies
+│ └── .gitignore Git exclusions
 │
-└── 🔒 .git/                         Version control
+└── .git/ Version control
 ```
 
 ---
@@ -146,17 +146,17 @@ fluoride-adsorption-hybrid/
 ### Run Phase Scripts
 ```bash
 # From project root (fluoride-adsorption-hybrid/):
-python3 src/phase1_doe_design.py           # Generate LHS (takes ~5 sec)
-python3 src/phase1_simulate_adsorption.py  # Simulate responses (takes ~10 sec)
-python3 src/phase2_langmuir_fitting.py     # Fit Langmuir model (takes ~20 sec)
+python3 src/phase1_doe_design.py # Generate LHS (takes ~5 sec)
+python3 src/phase1_simulate_adsorption.py # Simulate responses (takes ~10 sec)
+python3 src/phase2_langmuir_fitting.py # Fit Langmuir model (takes ~20 sec)
 # Phase 4 script (TO CREATE)
 ```
 
 ### View Project Status
 ```bash
-ls -lh results/phase{2,3}/                 # See outputs by phase
-wc -l results/phase3/*.csv                 # Check data sizes
-cat results/phase3/residual_analysis.json  # View Phase 3 metadata
+ls -lh results/phase{2,3}/ # See outputs by phase
+wc -l results/phase3/*.csv # Check data sizes
+cat results/phase3/residual_analysis.json # View Phase 3 metadata
 ```
 
 ### Check Data Quality
@@ -206,8 +206,8 @@ Quick RF (no tuning) explains **47.3% of residual variance** on test set:
 
 ### Conservative Scenario (70% residual R²)
 ```
-q_Langmuir R² = 0.8158  (baseline chemistry)
-q_residual R² = 0.70    (ML correction from Phase 4)
+q_Langmuir R² = 0.8158 (baseline chemistry)
+q_residual R² = 0.70 (ML correction from Phase 4)
 
 Hybrid Formula: q_final = q_Langmuir + ML_prediction
 
@@ -217,7 +217,7 @@ Result: Hybrid R² ≥ 0.902 (90.2%)
 ### Realistic Scenario (75% residual R²)
 ```
 q_Langmuir R² = 0.8158
-q_residual R² = 0.75    (likely with XGBoost + tuning)
+q_residual R² = 0.75 (likely with XGBoost + tuning)
 
 Result: Hybrid R² ≥ 0.945 (94.5%)
 ```
@@ -225,7 +225,7 @@ Result: Hybrid R² ≥ 0.945 (94.5%)
 ### Optimistic Scenario (80% residual R²)
 ```
 q_Langmuir R² = 0.8158
-q_residual R² = 0.80    (possible with ensemble methods)
+q_residual R² = 0.80 (possible with ensemble methods)
 
 Result: Hybrid R² ≥ 0.962 (96.2%)
 ```
@@ -258,12 +258,12 @@ Result: Hybrid R² ≥ 0.962 (96.2%)
 ### 2. Save Phase 4 Outputs
 ```
 results/phase4/
-├── rf_model.pkl              RandomForest trained model
-├── xgb_model.pkl             XGBoost trained model
-├── mlp_model.pkl             MLP trained model
-├── ml_predictions.csv        Predictions on test set
-├── model_comparison.json     Performance metrics for 3 models
-└── phase4_diagnostics.png    Comparison plots
+├── rf_model.pkl RandomForest trained model
+├── xgb_model.pkl XGBoost trained model
+├── mlp_model.pkl MLP trained model
+├── ml_predictions.csv Predictions on test set
+├── model_comparison.json Performance metrics for 3 models
+└── phase4_diagnostics.png Comparison plots
 ```
 
 ### 3. Document Phase 4 Results
@@ -283,10 +283,10 @@ results/phase4/
 
 | File | Size | Rows | Cols | Status |
 |------|------|------|------|--------|
-| ml_training_data.csv | 186 KB | 400 | 39 | ✅ Ready |
-| ml_test_data.csv | 46 KB | 100 | 39 | ✅ Ready |
-| feature_importance.csv | 1.3 KB | 38 | 2 | ✅ Reference |
-| residual_analysis.json | 680 B | — | — | ✅ Metadata |
+| ml_training_data.csv | 186 KB | 400 | 39 | Ready |
+| ml_test_data.csv | 46 KB | 100 | 39 | Ready |
+| feature_importance.csv | 1.3 KB | 38 | 2 | Reference |
+| residual_analysis.json | 680 B | — | — | Metadata |
 
 **All Phase 3 outputs verified. Phase 4 can begin immediately.**
 
@@ -295,24 +295,24 @@ results/phase4/
 ## Success Criteria
 
 ### Phase 4 Success
-- ✅ 3 trained ML models with documented hyperparameters
-- ✅ Test R² ≥ 0.70 on residual prediction
-- ✅ No overfitting (train-test gap < 0.15)
-- ✅ Feature importance analysis shows pH-based features in top 5
+- 3 trained ML models with documented hyperparameters
+- Test R² ≥ 0.70 on residual prediction
+- No overfitting (train-test gap < 0.15)
+- Feature importance analysis shows pH-based features in top 5
 
 ### Project Success (Final)
-- ✅ Hybrid model R² ≥ 0.94 on validation set
-- ✅ All 8 phases documented and reproducible
-- ✅ Code released open-source (GitHub)
-- ✅ Publication-ready manuscript completed
+- Hybrid model R² ≥ 0.94 on validation set
+- All 8 phases documented and reproducible
+- Code released open-source (GitHub)
+- Publication-ready manuscript completed
 
 ---
 
 ## Contact & Reproducibility
 
-**Last Updated:** May 6, 2026  
-**Python Version:** 3.13  
-**Key Dependencies:** pandas, scikit-learn, xgboost, numpy, scipy  
+**Last Updated:** May 6, 2026
+**Python Version:** 3.13
+**Key Dependencies:** pandas, scikit-learn, xgboost, numpy, scipy
 **Reproducibility:** All random seeds fixed (seed=42); fully deterministic output
 
 See `requirements.txt` for full dependency list and versions.

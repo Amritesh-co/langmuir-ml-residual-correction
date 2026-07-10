@@ -1,0 +1,23 @@
+{
+  "residual_model": "Stacking(XGBoost+RandomForest+GradientBoosting)->RidgeCV",
+  "validation": "5-fold cross-validated out-of-fold on 500 samples",
+  "n_features": 24,
+  "residual_oof": {
+    "r2": 0.6828433856467229,
+    "rmse": 0.2972168134870761,
+    "mae": 0.2323835896353249
+  },
+  "langmuir_full": {
+    "r2": 0.8157843036148862,
+    "rmse": 0.5277600195589893,
+    "mae": 0.42819213939327355
+  },
+  "hybrid_oof": {
+    "r2": 0.941574773423766,
+    "rmse": 0.2972168134870761,
+    "mae": 0.2323835896353249
+  },
+  "rmse_reduction_pct": 43.7,
+  "target_R2": 0.94,
+  "target_met": true
+}

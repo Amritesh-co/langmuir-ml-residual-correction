@@ -247,7 +247,10 @@
 
 <div id="toast"></div>
 
-<script src="/static/bg.js"></script>
-<script src="/static/app.js"></script>
+<!-- Bump ?v=N on bg.js/app.js whenever either file changes. Cloudflare edge caching
+     (4h TTL) has shown inconsistent propagation across PoPs after cache purges, so a
+     version query string is the only guaranteed way to force a fresh fetch on deploy. -->
+<script src="/static/bg.js?v=4"></script>
+<script src="/static/app.js?v=4"></script>
 </body>
 </html>

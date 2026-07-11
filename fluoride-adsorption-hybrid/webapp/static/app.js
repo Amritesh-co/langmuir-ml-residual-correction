@@ -47,15 +47,6 @@ async function predict24(track = true) {
     document.getElementById("val24").textContent = d.q_hybrid.toFixed(2);
     setGauge(document.getElementById("gauge24"), d.q_hybrid, d.range[0], d.range[1]);
 
-    document.getElementById("b24_base").textContent = `${d.q_langmuir.toFixed(3)} mg/g`;
-    document.getElementById("b24_res").textContent = `${d.residual >= 0 ? "+" : ""}${d.residual.toFixed(3)} mg/g`;
-    document.getElementById("b24_final").textContent = `${d.q_hybrid.toFixed(3)} mg/g`;
-
-    const maxAbs = Math.max(Math.abs(d.q_langmuir), Math.abs(d.residual), Math.abs(d.q_hybrid), 0.001);
-    document.getElementById("bar24_base").style.width = `${Math.min(100, Math.abs(d.q_langmuir) / maxAbs * 100)}%`;
-    document.getElementById("bar24_res").style.width = `${Math.min(100, Math.abs(d.residual) / maxAbs * 100)}%`;
-    document.getElementById("bar24_final").style.width = `${Math.min(100, Math.abs(d.q_hybrid) / maxAbs * 100)}%`;
-
     toast("Prediction updated");
   } catch (e) {
     toast("Error: " + e.message);
@@ -84,11 +75,6 @@ async function predict4(track = true) {
 
     document.getElementById("val4").textContent = d.final.toFixed(1);
     setGauge(document.getElementById("gauge4"), d.final, d.range[0], d.range[1]);
-
-    document.getElementById("b4_base").textContent = `${d.q_baseline.toFixed(2)}%`;
-    document.getElementById("b4_res").textContent = `${d.residual >= 0 ? "+" : ""}${d.residual.toFixed(2)}%`;
-    document.getElementById("bar4_base").style.width = `100%`;
-    document.getElementById("bar4_res").style.width = `${Math.min(100, Math.abs(d.residual) / Math.max(Math.abs(d.q_baseline), 0.001) * 100)}%`;
 
     toast("Prediction updated");
   } catch (e) {
